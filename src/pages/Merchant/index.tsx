@@ -1,5 +1,5 @@
-import { Button, Space, Drawer, Switch } from 'antd';
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Modal, Drawer, Switch } from 'antd';
+import { ShareAltOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProFormColumnsType, ProFormLayoutType, ProFormInstance } from '@ant-design/pro-components';
 import { ProTable, TableDropdown, BetaSchemaForm, } from '@ant-design/pro-components';
 import React, { useEffect, useRef, useState } from 'react';
@@ -83,7 +83,7 @@ const FormDrawer: React.FC<FormDrawerProps> = ({ title, open, onClose, columns, 
 export default () => {
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
-  const [currentItem, setCurrentItem] = useState({ open: false, merchantId: '', title: '',channelList:[] })
+  const [currentItem, setCurrentItem] = useState({ open: false, merchantId: '', title: '', channelList: [] })
   const [formState, setFormState] = useState<FormDrawerProps>({
     title: '',
     open: false,
@@ -92,15 +92,15 @@ export default () => {
 
   })
 
-  const [channelList,setChannelList] =useState([])
+  const [channelList, setChannelList] = useState([])
 
- useEffect(()=>{
-  const getList=async ()=>{
-    const data=await fetchChannel({page:1,size:999})
-    setChannelList(data.data)
-  }
-  getList()
- },[])
+  useEffect(() => {
+    const getList = async () => {
+      const data = await fetchChannel({ page: 1, size: 999 })
+      setChannelList(data.data)
+    }
+    getList()
+  }, [])
 
 
 
@@ -372,23 +372,7 @@ export default () => {
 
   const recharge = (record) => {
     const columns: ProFormColumnsType[] = [
-      {
-        title: '充值金额',
-        dataIndex: 'amount',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '此项为必填项',
-            },
-          ],
-        },
-        width: 'xl',
-        colProps: {
-          xs: 24,
-          md: 24,
-        },
-      },
+      
       {
         title: '到账金额',
         dataIndex: 'ramount',
@@ -400,10 +384,22 @@ export default () => {
             },
           ],
         },
+        valueType: 'money',
         width: 'xl',
         colProps: {
           xs: 24,
           md: 24,
+        },
+        dependencies: ['amount'],
+        fieldProps: (form) => {
+          const amount = form.getFieldValue('amount');
+          const rate = form.getFieldValue('payoutRatio');
+          form.setFieldValue('ramount',amount * rate,);
+          return {
+            placeholder: '',
+            value: amount * rate,
+            disabled:true
+          };
         },
       },
       {
@@ -419,6 +415,24 @@ export default () => {
         },
         fieldProps: {
           disabled: true
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+      },
+      {
+        title: '充值金额',
+        valueType: 'money',
+        dataIndex: 'amount',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
         },
         width: 'xl',
         colProps: {
@@ -473,12 +487,31 @@ export default () => {
     })
   }
 
+  const ShowDetai=(record)=>{
+    Modal.info({
+      title: '开户信息',
+      content: (
+        <div>
+          <p>后台地址: {window.location.origin}</p>
+          <p>登录账号: {record.merchantName}</p>
+          <p>初始密码: {record.appBg}</p>
+          <p>商户ID: {record.id}</p>
+          <p>商户密钥: {record.appSecret}</p>
+          <p>请务必及时修改登录密码,启用代付前请于开发设置中设置ip白名单</p>
+
+        </div>
+      ),
+      onOk() {},
+    });
+  }
+
 
   const columns: ProColumns<GithubIssueItem>[] = [
     {
       title: 'id',
       dataIndex: 'id',
       ellipsis: true,
+      render:(text,record)=>(<a onClick={()=>ShowDetai(record)}>{record.id}<ShareAltOutlined /></a>)
     },
     {
       title: '后台登录账号',

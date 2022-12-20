@@ -69,6 +69,13 @@ export default [
     ],
   },
   {
+    path: '/agency',
+    name: '代理管理',
+    icon: 'crown',
+    access: 'canAdmin',
+    component: './Config/agency',
+  },
+  {
     path: '/merchant',
     name: '商户管理',
     icon: 'smile',

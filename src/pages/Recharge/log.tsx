@@ -3,7 +3,8 @@ import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProFormColumnsType, ProFormLayoutType, ProFormInstance } from '@ant-design/pro-components';
 import { ProTable, ProCard, BetaSchemaForm } from '@ant-design/pro-components';
 import React, { useRef, useState } from 'react';
-import { addMerchantChannel, rechargeLog, rechargeLogS, updateMerchantChannel, rechargeMerchant } from '@/services/ant-design-pro/api';
+import { addMerchantChannel, rechargeLog, rechargeLogS, cancleRechargeLog, rechargeMerchant } from '@/services/ant-design-pro/api';
+import { downloadExl } from '@/utils/excle';
 
 type GithubIssueItem = {
   "id": number;// 8805,
@@ -91,9 +92,8 @@ export default () => {
 
 
   const changeStatus = async (record) => {
-    await updateMerchantChannel({
+    await cancleRechargeLog({
       id: record.id,
-      status: record.status === 0 ? 1 : 0
     })
     if (formRef.current) {
       formRef.current.submit()
@@ -410,7 +410,7 @@ export default () => {
       ellipsis: true,
     },
     {
-      title: '操作',
+      title: '类型',
       dataIndex: 'type',
       ellipsis: true,
       search: false,
@@ -430,12 +430,16 @@ export default () => {
       search: {
         transform: (value: any) => ({ start: value[0], end: value[1] }),
       },
-      render:(text,record)=>{
+      proFieldProps: {
+        showTime: { format: 'HH:mm:ss' },
+        format: "YYYY-MM-DD HH:mm:ss"
+      },
+      render: (text, record) => {
         console.log(record)
         return record.createTime
       }
 
-      
+
     },
     {
       title: '备注',
@@ -443,15 +447,31 @@ export default () => {
       ellipsis: true,
       search: false,
     },
+    {
+      title: '操作',
+      valueType: 'option',
+      key: 'option',
+      render: (text, record, _, action) => [
+        <Button
+          key="editable"
+          onClick={() => { changeStatus(record) }}
+          danger
+        >
+          撤销
+        </Button>,
+
+
+      ],
+    },
   ];
 
   const columns2: ProColumns<GithubIssueItem>[] = [
-   
+
     {
       title: '商户Id',
       dataIndex: 'merchantId',
       ellipsis: true,
-      
+
     },
     {
       title: '操作',
@@ -471,7 +491,7 @@ export default () => {
       dataIndex: 'createTime',
       ellipsis: true,
       valueType: 'dateRange',
-      hideInTable:true,
+      hideInTable: true,
       formItemProps: {
         rules: [
           {
@@ -480,17 +500,21 @@ export default () => {
           },
         ],
       },
+      proFieldProps: {
+        showTime: { format: 'HH:mm:ss' },
+        format: "YYYY-MM-DD HH:mm:ss"
+      },
       search: {
         transform: (value: any) => ({ start: value[0], end: value[1] }),
       },
     },
   ];
 
-  const handleCount=()=>{
-    if(formRef.current){
+  const handleCount = () => {
+    if (formRef.current) {
       console.log(formRef.current);
-      const values=formRef.current.getFieldsValue();
-      if(formRef2.current){
+      const values = formRef.current.getFieldsValue();
+      if (formRef2.current) {
         formRef2.current.setFieldsValue(values)
         formRef2.current.submit()
       }
@@ -541,9 +565,40 @@ export default () => {
               labelWidth: 'auto',
               optionRender: (searchConfig, formProps, dom) => [
                 ...dom.reverse(),
-                <Button key="out" onClick={handleCount}>
-                  统计
-                </Button>,
+                <span>
+                  <Button
+                    key="out"
+                    onClick={async () => {
+                      const values = searchConfig?.form?.getFieldsValue();
+                      console.log(values);
+                      const data = await rechargeLog({
+                        page: 1,
+                        size: 10000000,
+                        ...values
+                      })
+                      console.log(data.data)
+                      const keyMap = {}
+                      columns.forEach(item => {
+                        keyMap[item.dataIndex || 'unknown'] = item.title;
+                      })
+                      const arr = data.data.map(item => {
+                        const newObj = {}
+                        Object.keys(item).forEach(key => {
+                          if (keyMap[key]) {
+                            newObj[keyMap[key]] = item[key]
+                          } else {
+                            newObj[key] = item[key]
+                          }
+                        })
+                        return newObj
+                      })
+                      downloadExl(arr, 'xlsx', '充值记录')
+                      console.log(values)
+                    }}
+                  >
+                    导出
+
+                  </Button><a id="hf" style={{ display: 'none' }}></a></span>,
               ],
             }}
             form={{
@@ -553,7 +608,11 @@ export default () => {
               pageSize: 10,
               onChange: (page) => console.log(page),
             }}
-            dateFormatter="string"
+            // dateFormatter="string"
+            dateFormatter={(value, valueType) => {
+              console.log('====>', value, valueType);
+              return value.format('YYYY-MM-DD HH:mm:ss');
+            }}
             headerTitle="充值记录"
             toolBarRender={() => [
 
@@ -567,7 +626,7 @@ export default () => {
             formRef={formRef2}
             cardBordered
             request={async (params = {}, sort, filter) => {
-              if(!params.start) return {
+              if (!params.start) return {
                 data: [],
                 success: true,
                 total: 0
@@ -603,9 +662,10 @@ export default () => {
             search={{
               defaultCollapsed: false,
               labelWidth: 'auto',
+              searchText: '统计',
               optionRender: (searchConfig, formProps, dom) => [
                 ...dom.reverse(),
-                
+
               ],
             }}
             form={{
@@ -615,11 +675,15 @@ export default () => {
               pageSize: 10,
               onChange: (page) => console.log(page),
             }}
-            dateFormatter="string"
+            // dateFormatter="string"
             headerTitle="统计数据"
             toolBarRender={() => [
 
             ]}
+            dateFormatter={(value, valueType) => {
+              console.log('====>', value, valueType);
+              return value.format('YYYY-MM-DD HH:mm:ss');
+            }}
           />
         </ProCard>
       </ProCard>

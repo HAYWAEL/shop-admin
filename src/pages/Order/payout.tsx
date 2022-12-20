@@ -3,6 +3,10 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useRef } from 'react';
 import { payoutList } from '@/services/ant-design-pro/api';
+import { useModel } from '@umijs/max';
+import { Button,List,Typography } from 'antd';
+import trans from '@/assets/trans.png'
+import { downloadExl } from '@/utils/excle';
 
 type GithubIssueItem = {
 
@@ -35,7 +39,7 @@ type GithubIssueItem = {
   "detail": "MIRTHIPATI ESWARARAO"
 };
 
-const columns: ProColumns<GithubIssueItem>[] = [
+let columns: ProColumns<GithubIssueItem>[] = [
   {
     title: '订单id',
     dataIndex: 'id',
@@ -140,19 +144,71 @@ const columns: ProColumns<GithubIssueItem>[] = [
     search: {
       transform: (value: any) => ({ start: value[0], end: value[1] }),
     },
+    proFieldProps:{
+      showTime:{ format: 'HH:mm:ss' },
+      format:"YYYY-MM-DD HH:mm:ss"
+    },
     hideInTable:true
-
-    
   },
 ];
 
 export default () => {
   const actionRef = useRef<ActionType>();
+  const {initialState} =useModel('@@initialState')
+  if(initialState){
+    if(initialState.currentUser?.access==='admin'){
+      columns=columns.concat([{
+        title: '代理ID',
+        dataIndex: 'agencyId',
+        ellipsis: true,
+        search: false,
+      },
+      {
+        title: '代理费用',
+        dataIndex: 'agencyFee',
+        ellipsis: true,
+        search: false,
+        copyable: true,
+      },
+      {
+        title: '平台费用',
+        dataIndex: 'channelFee',
+        ellipsis: true,
+        search: false,
+      }])
+    }
+  }
+  const ExpandedRowRender=({record})=>{
+    console.log(record)
+    return <List
+    
+    bordered
+    dataSource={
+      [
+        {key:'转账类型',value:record.payoutAccountType},
+        {key:'转账对象名',value:record.payoutContactName},
+        {key:'转账对象邮箱',value:record.payoutContactEmail},
+        {key:'转账对象联系方式',value:record.payoutContact},
+        {key:'转账对象vpa地址',value:record.payoutVpaAddress},
+        {key:'转账时间',value:record.payoutTime}
+      ]
+    }
+    renderItem={(item) => (
+      <List.Item>
+        <Typography.Text mark>{item.key}</Typography.Text>:<Typography.Text strong>{item.value}</Typography.Text> 
+      </List.Item>
+    )}
+  />
+  }
+
+  
   return (
     <ProTable<GithubIssueItem>
       columns={columns}
       actionRef={actionRef}
+      scroll={{ x: 1000 }}
       cardBordered
+      expandable={{ expandedRowRender:(record)=><ExpandedRowRender record={record}></ExpandedRowRender> }}
       request={async (params = {}, sort, filter) => {
         console.log(sort, filter, params);
         const data = await payoutList({
@@ -174,10 +230,11 @@ export default () => {
           console.log('value: ', value);
         },
       }}
-      rowKey="created_at"
-      search={{
-        labelWidth: 'auto',
-      }}
+      rowKey="id"
+      // search={{
+      //   labelWidth: 'auto',
+      //   defaultCollapsed: false,
+      // }}
       options={{
         setting: {
           listsHeight: 400,
@@ -190,8 +247,56 @@ export default () => {
         pageSize: 10,
         onChange: (page) => console.log(page),
       }}
-      dateFormatter="string"
+      // dateFormatter="string"
       headerTitle="代付订单"
+      dateFormatter={(value, valueType) => {
+        console.log('====>', value, valueType);
+        return value.format('YYYY-MM-DD HH:mm:ss');
+      }}
+
+      search={{
+        defaultCollapsed: false,
+        labelWidth: 'auto',
+        optionRender: (searchConfig, formProps, dom) => [
+          ...dom.reverse(),
+          <span>
+            <Button
+              key="out"
+              onClick={async () => {
+                const values = searchConfig?.form?.getFieldsValue();
+                console.log(values);
+                const data = await payoutList({
+                  page: 1,
+                  size: 10000000,
+                  ...values
+                })
+                console.log(data.data)
+                const keyMap = {}
+                columns.forEach(item => {
+                  keyMap[item.dataIndex || 'unknown'] = item.title;
+                })
+                const arr = data.data.map(item => {
+                  const newObj = {}
+                  Object.keys(item).forEach(key => {
+                    if (keyMap[key]) {
+                      newObj[keyMap[key]] = item[key]
+                    } else {
+                      newObj[key] = item[key]
+                    }
+                  })
+                  return newObj
+                })
+                downloadExl(arr, 'xlsx', '代付订单')
+                console.log(values)
+              }}
+            >
+              导出
+
+            </Button><a id="hf" style={{ display: 'none' }}></a></span>,
+        ],
+      }}
+
+      
     />
   );
 };

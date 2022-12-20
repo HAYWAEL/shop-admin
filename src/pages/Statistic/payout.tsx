@@ -2,7 +2,9 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useRef } from 'react';
+import { Button } from 'antd';
 import { statisticPayout } from '@/services/ant-design-pro/api';
+import { downloadExl } from '@/utils/excle';
 
 type GithubIssueItem = {
 
@@ -27,7 +29,11 @@ const columns: ProColumns<GithubIssueItem>[] = [
     },
     render:(text,record)=>{
       return record.date
-    }
+    },
+    proFieldProps:{
+      showTime:{ format: 'HH:mm:ss' },
+      format:"YYYY-MM-DD HH:mm:ss"
+    },
   },
   {
     title: '通道编号',
@@ -115,9 +121,9 @@ export default () => {
         },
       }}
       rowKey="created_at"
-      search={{
-        labelWidth: 'auto',
-      }}
+      // search={{
+      //   labelWidth: 'auto',
+      // }}
       options={{
         setting: {
           listsHeight: 400,
@@ -130,8 +136,56 @@ export default () => {
         pageSize: 10,
         onChange: (page) => console.log(page),
       }}
-      dateFormatter="string"
+      // dateFormatter="string"
       headerTitle="代付订单"
+      dateFormatter={(value, valueType) => {
+        console.log('====>', value, valueType);
+        return value.format('YYYY-MM-DD HH:mm:ss');
+      }}
+      search={{
+        defaultCollapsed: false,
+        labelWidth: 'auto',
+        optionRender: (searchConfig, formProps, dom) => [
+          ...dom.reverse(),
+          <span>
+            <Button
+              key="out"
+              onClick={async () => {
+                const values = searchConfig?.form?.getFieldsValue();
+                console.log(values);
+                const data = await statisticPayout({
+                  page: 1,
+                  size: 10000000,
+                  ...values
+                })
+                console.log(data)
+                const keyMap = {}
+                columns.forEach(item => {
+                  keyMap[item.dataIndex || 'unknown'] = item.title;
+                })
+                const arr = data.map(item => {
+                  const newObj = {}
+                  Object.keys(item).forEach(key => {
+                    if (keyMap[key]) {
+                      newObj[keyMap[key]] = item[key]
+                    } else {
+                      newObj[key] = item[key]
+                    }
+                  })
+                  return newObj
+                })
+                downloadExl(arr, 'xlsx', '代付订单')
+                console.log(values)
+              }}
+            >
+              导出
+
+            </Button><a id="hf" style={{ display: 'none' }}></a></span>,
+        ],
+      }}
+
+      
+      
     />
   );
 };

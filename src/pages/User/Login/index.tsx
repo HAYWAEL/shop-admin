@@ -226,8 +226,8 @@ const Login: React.FC = () => {
                   prefix: <UserOutlined />,
                 }}
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
+                  id: 'pages.login.username.placeholder2',
+                  defaultMessage: '用户名',
                 })}
                 rules={[
                   {
@@ -248,8 +248,8 @@ const Login: React.FC = () => {
                   prefix: <LockOutlined />,
                 }}
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: ant.design',
+                  id: 'pages.login.password.placeholder2',
+                  defaultMessage: '密码',
                 })}
                 rules={[
                   {
