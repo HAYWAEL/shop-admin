@@ -75,16 +75,18 @@ export const errorConfig: RequestConfig = {
       } else if (error.response) {
         console.log('etf')
         if (error.response.status === 401) {
-          message.error('登陆已失效');
+          message.error('登录已失效');
          
           // 如果没有登录，重定向到 login
           
           history.push(loginPath);
           return 
         }
+        let msg='';
+        if(error.response&&error.response.data&&error.response.data.error)msg=error.response.data.error
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`Response status:${error.response.status}`);
+        message.error(`Response status:${error.response.status} ${msg}`);
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
@@ -120,7 +122,7 @@ export const errorConfig: RequestConfig = {
       console.log(response,'9999999')
       const { data } = response as unknown as ResponseStructure;
       if (response.status === 401) {
-        message.error('登陆已失效');
+        message.error('登录已失效');
        
         // 如果没有登录，重定向到 login
         

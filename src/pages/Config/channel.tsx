@@ -99,8 +99,13 @@ export default () => {
   useEffect(() => {
     const getList = async () => {
       const data = await channelType();
-      console.log(data,'data---')
+      console.log(data, 'data---')
       setChannelType(data.map(item => ({ label: item, name: item })))
+      const data2 = await fetchChannel({
+        page:1,size:1000000
+      });
+      console.log(data2, 'data---')
+      setChannelList(data2.data.map(item => ({ label: item.name, name: item.id,value:item.id })))
     }
     getList()
   }, [])
@@ -119,7 +124,7 @@ export default () => {
   }
 
   const add = () => {
-    console.log(channelType,'channelType')
+    console.log(channelType, 'channelType')
     const columns: ProFormColumnsType[] = [
       {
         title: '三方通道类型',
@@ -133,8 +138,8 @@ export default () => {
           ],
         },
         valueType: 'select',
-        fieldProps:{
-          options:channelTypes
+        fieldProps: {
+          options: channelTypes
         },
         width: 'xl',
         colProps: {
@@ -171,8 +176,53 @@ export default () => {
           ],
         },
         valueType: 'select',
-        fieldProps:{
-          options:[{value:'代收',label:'代收'},{value:'代付',label:'代付'},{value:'代收代付',label:'代收代付'}]
+        fieldProps: {
+          options: [{ value: '代收', label: '代收' }, { value: '代付', label: '代付' }, { value: '代收代付', label: '代收代付' }]
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+      },
+      {
+        title: '通道费率',
+        dataIndex: 'channelFee',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
+      },
+      {
+        title: '通道单笔',
+        dataIndex: 'channelSingleTrans',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 0,
+          min: 0
         },
         width: 'xl',
         colProps: {
@@ -192,7 +242,7 @@ export default () => {
           md: 24,
         },
       },
-      
+
       {
         title: '备注',
         dataIndex: 'remark',
@@ -239,8 +289,8 @@ export default () => {
           ],
         },
         valueType: 'select',
-        fieldProps:{
-          options:channelTypes
+        fieldProps: {
+          options: channelTypes
         },
         width: 'xl',
         colProps: {
@@ -277,8 +327,53 @@ export default () => {
           ],
         },
         valueType: 'select',
-        fieldProps:{
-          options:[{value:'代收',label:'代收'},{value:'代付',label:'代付'},{value:'代收代付',label:'代收代付'}]
+        fieldProps: {
+          options: [{ value: '代收', label: '代收' }, { value: '代付', label: '代付' }, { value: '代收代付', label: '代收代付' }]
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+      },
+      {
+        title: '通道费率',
+        dataIndex: 'channelFee',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
+      },
+      {
+        title: '通道单笔',
+        dataIndex: 'channelSingleTrans',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 0,
+          min: 0
         },
         width: 'xl',
         colProps: {
@@ -298,7 +393,7 @@ export default () => {
           md: 24,
         },
       },
-      
+
       {
         title: '备注',
         dataIndex: 'remark',
@@ -332,7 +427,7 @@ export default () => {
 
   const switchChannel = (record) => {
     const columns: ProFormColumnsType[] = [
-      
+
       {
         title: '当前通道',
         dataIndex: 'channelId',
@@ -369,6 +464,10 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType:'select',
+        fieldProps:{
+          options:channelList
+        }
       },
 
 
@@ -378,7 +477,7 @@ export default () => {
       title: '通道切换',
       open: true,
       columns,
-      initValue: {  channelId: record.id },
+      initValue: { channelId: record.id },
       submit: channelSwitch,
       key: 're' + record.id,
       callback: () => {
@@ -412,10 +511,10 @@ export default () => {
       dataIndex: 'type',
       ellipsis: true,
       valueType: 'select',
-      fieldProps:{
-        options:channelTypes
+      fieldProps: {
+        options: channelTypes
       },
-      
+
     },
     {
       title: '通道类型',
@@ -429,18 +528,18 @@ export default () => {
       ellipsis: true,
       search: false,
     },
-    {
-      title: '通道名称',
-      dataIndex: 'name',
-      ellipsis: true,
-      search: false,
-    },
+    // {
+    //   title: '通道名称',
+    //   dataIndex: 'name',
+    //   ellipsis: true,
+    //   search: false,
+    // },
     {
       title: '状态',
       dataIndex: 'status',
       // ellipsis: true,
       search: false,
-      render: (text, record) => <> <Switch checked={text === 1 ? true : false} checkedChildren="1" unCheckedChildren="0" onChange={() => { changeStatus(record) }} /> </>
+      render: (text, record) => <> <Switch checked={text === 1 ? true : false} checkedChildren="正常" unCheckedChildren="封禁" onChange={() => { changeStatus(record) }} /> </>
     },
     {
       title: '创建时间',

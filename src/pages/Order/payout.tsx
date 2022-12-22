@@ -4,7 +4,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { useRef } from 'react';
 import { payoutList } from '@/services/ant-design-pro/api';
 import { useModel } from '@umijs/max';
-import { Button,List,Typography } from 'antd';
+import { Button, List, Card, Typography } from 'antd';
 import trans from '@/assets/trans.png'
 import { downloadExl } from '@/utils/excle';
 
@@ -40,23 +40,24 @@ type GithubIssueItem = {
 };
 
 let columns: ProColumns<GithubIssueItem>[] = [
+  // {
+  //   title: '订单id',
+  //   dataIndex: 'id',
+  //   ellipsis: true,
+  // },
   {
-    title: '订单id',
-    dataIndex: 'id',
+    title: '商户订单号',
+    dataIndex: 'merchantPayoutId',
     ellipsis: true,
+    copyable: true,
+
   },
   {
     title: '商户id',
     dataIndex: 'merchantId',
     ellipsis: true,
   },
-  {
-    title: '商户订单号',
-    dataIndex: 'merchantPayoutId',
-    ellipsis: true,
-    copyable: true,
-    
-  },
+
   {
     title: '转账类型',
     dataIndex: 'payoutAccountType',
@@ -80,7 +81,7 @@ let columns: ProColumns<GithubIssueItem>[] = [
     title: '渠道编号',
     dataIndex: 'channelId',
     ellipsis: true,
-    
+
   },
   {
     title: '订单状态',
@@ -134,7 +135,7 @@ let columns: ProColumns<GithubIssueItem>[] = [
     title: '备注',
     dataIndex: 'remark',
     ellipsis: true,
-    
+
   },
   {
     title: '时间',
@@ -144,20 +145,21 @@ let columns: ProColumns<GithubIssueItem>[] = [
     search: {
       transform: (value: any) => ({ start: value[0], end: value[1] }),
     },
-    proFieldProps:{
-      showTime:{ format: 'HH:mm:ss' },
-      format:"YYYY-MM-DD HH:mm:ss"
+    proFieldProps: {
+      showTime: { format: 'HH:mm:ss' },
+      format: "YYYY-MM-DD HH:mm:ss"
     },
-    hideInTable:true
+    hideInTable: true
   },
 ];
 
 export default () => {
   const actionRef = useRef<ActionType>();
-  const {initialState} =useModel('@@initialState')
-  if(initialState){
-    if(initialState.currentUser?.access==='admin'){
-      columns=columns.concat([{
+  const { initialState } = useModel('@@initialState')
+  let cols = columns
+  if (initialState) {
+    if (initialState.currentUser?.access === 'admin') {
+      cols = columns.concat([{
         title: '代理ID',
         dataIndex: 'agencyId',
         ellipsis: true,
@@ -178,37 +180,40 @@ export default () => {
       }])
     }
   }
-  const ExpandedRowRender=({record})=>{
+  const ExpandedRowRender = ({ record }) => {
     console.log(record)
-    return <List
-    
-    bordered
-    dataSource={
-      [
-        {key:'转账类型',value:record.payoutAccountType},
-        {key:'转账对象名',value:record.payoutContactName},
-        {key:'转账对象邮箱',value:record.payoutContactEmail},
-        {key:'转账对象联系方式',value:record.payoutContact},
-        {key:'转账对象vpa地址',value:record.payoutVpaAddress},
-        {key:'转账时间',value:record.payoutTime}
-      ]
-    }
-    renderItem={(item) => (
-      <List.Item>
-        <Typography.Text mark>{item.key}</Typography.Text>:<Typography.Text strong>{item.value}</Typography.Text> 
-      </List.Item>
-    )}
-  />
+    return <Card>
+      <Typography.Text mark>{record.detail}</Typography.Text>
+    </Card>
+    //   return <List
+
+    //   bordered
+    //   dataSource={
+    //     [
+    //       {key:'转账类型',value:record.payoutAccountType},
+    //       {key:'转账对象名',value:record.payoutContactName},
+    //       {key:'转账对象邮箱',value:record.payoutContactEmail},
+    //       {key:'转账对象联系方式',value:record.payoutContact},
+    //       {key:'转账对象vpa地址',value:record.payoutVpaAddress},
+    //       {key:'转账时间',value:record.payoutTime}
+    //     ]
+    //   }
+    //   renderItem={(item) => (
+    //     <List.Item>
+    //       <Typography.Text mark>{item.key}</Typography.Text>:<Typography.Text strong>{item.value}</Typography.Text> 
+    //     </List.Item>
+    //   )}
+    // />
   }
 
-  
+
   return (
     <ProTable<GithubIssueItem>
-      columns={columns}
+      columns={cols}
       actionRef={actionRef}
       scroll={{ x: 1000 }}
       cardBordered
-      expandable={{ expandedRowRender:(record)=><ExpandedRowRender record={record}></ExpandedRowRender> }}
+      expandable={{ expandedRowRender: (record) => <ExpandedRowRender record={record}></ExpandedRowRender> }}
       request={async (params = {}, sort, filter) => {
         console.log(sort, filter, params);
         const data = await payoutList({
@@ -272,7 +277,7 @@ export default () => {
                 })
                 console.log(data.data)
                 const keyMap = {}
-                columns.forEach(item => {
+                cols.forEach(item => {
                   keyMap[item.dataIndex || 'unknown'] = item.title;
                 })
                 const arr = data.data.map(item => {
@@ -281,7 +286,7 @@ export default () => {
                     if (keyMap[key]) {
                       newObj[keyMap[key]] = item[key]
                     } else {
-                      newObj[key] = item[key]
+                      // newObj[key] = item[key]
                     }
                   })
                   return newObj
@@ -296,7 +301,7 @@ export default () => {
         ],
       }}
 
-      
+
     />
   );
 };

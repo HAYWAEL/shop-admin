@@ -61,11 +61,7 @@ export default [
         name: '通道配置',
         component: './Config/channel',
       },
-      {
-        path: '/config/agency',
-        name: '代理管理',
-        component: './Config/agency',
-      },
+      
     ],
   },
   {

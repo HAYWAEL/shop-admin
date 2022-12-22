@@ -133,6 +133,12 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
       {
         title: '代付费率',
@@ -150,6 +156,12 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
       {
         title: '代理id',
@@ -164,10 +176,38 @@ export default () => {
         },
       },
       {
+        title: '代付单笔',
+        dataIndex: 'payoutSingleTrans',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 0,
+          min: 0
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+      },
+      {
         title: '代理单笔',
         dataIndex: 'agencySingleTrans',
         formItemProps: {
 
+        },
+
+        valueType: 'digit',
+        fieldProps: {
+          precision: 0,
+          min: 0
         },
         width: 'xl',
         colProps: {
@@ -186,31 +226,43 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
-      {
-        title: '平台费率',
-        dataIndex: 'channelRatio',
-        formItemProps: {
+      // {
+      //   title: '平台费率',
+      //   dataIndex: 'channelRatio',
+      //   formItemProps: {
 
-        },
-        width: 'xl',
-        colProps: {
-          xs: 24,
-          md: 24,
-        },
-      },
-      {
-        title: '平台费',
-        dataIndex: 'channelFee',
-        formItemProps: {
+      //   },
+      //   width: 'xl',
+      //   colProps: {
+      //     xs: 24,
+      //     md: 24,
+      //   },
+      //   valueType: 'digit',
+      //   fieldProps: {
+      //     precision: 3,
+      //     max: 1,
+      //     min: 0
+      //   },
+      // },
+      // {
+      //   title: '平台费',
+      //   dataIndex: 'channelFee',
+      //   formItemProps: {
 
-        },
-        width: 'xl',
-        colProps: {
-          xs: 24,
-          md: 24,
-        },
-      },
+      //   },
+      //   width: 'xl',
+      //   colProps: {
+      //     xs: 24,
+      //     md: 24,
+      //   },
+      // },
       {
         title: 'ips',
         dataIndex: 'ips',
@@ -261,6 +313,12 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
       {
         title: '代付费率',
@@ -278,6 +336,12 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
       {
         title: '代理id',
@@ -292,10 +356,38 @@ export default () => {
         },
       },
       {
+        title: '代付单笔',
+        dataIndex: 'payoutSingleTrans',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '此项为必填项',
+            },
+          ],
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 0,
+          min: 0
+        },
+        width: 'xl',
+        colProps: {
+          xs: 24,
+          md: 24,
+        },
+      },
+      {
         title: '代理单笔',
         dataIndex: 'agencySingleTrans',
         formItemProps: {
 
+        },
+
+        valueType: 'digit',
+        fieldProps: {
+          precision: 0,
+          min: 0
         },
         width: 'xl',
         colProps: {
@@ -314,6 +406,12 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
       {
         title: '平台费率',
@@ -325,6 +423,12 @@ export default () => {
         colProps: {
           xs: 24,
           md: 24,
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
         },
       },
       {
@@ -373,55 +477,55 @@ export default () => {
   const recharge = (record) => {
     const columns: ProFormColumnsType[] = [
       
-      {
-        title: '到账金额',
-        dataIndex: 'ramount',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '此项为必填项',
-            },
-          ],
-        },
-        valueType: 'money',
-        width: 'xl',
-        colProps: {
-          xs: 24,
-          md: 24,
-        },
-        dependencies: ['amount'],
-        fieldProps: (form) => {
-          const amount = form.getFieldValue('amount');
-          const rate = form.getFieldValue('payoutRatio');
-          form.setFieldValue('ramount',amount * rate,);
-          return {
-            placeholder: '',
-            value: amount * rate,
-            disabled:true
-          };
-        },
-      },
-      {
-        title: '商户费率',
-        dataIndex: 'payoutRatio',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '此项为必填项',
-            },
-          ],
-        },
-        fieldProps: {
-          disabled: true
-        },
-        width: 'xl',
-        colProps: {
-          xs: 24,
-          md: 24,
-        },
-      },
+      // {
+      //   title: '到账金额',
+      //   dataIndex: 'ramount',
+      //   formItemProps: {
+      //     rules: [
+      //       {
+      //         required: true,
+      //         message: '此项为必填项',
+      //       },
+      //     ],
+      //   },
+      //   valueType: 'money',
+      //   width: 'xl',
+      //   colProps: {
+      //     xs: 24,
+      //     md: 24,
+      //   },
+      //   dependencies: ['amount'],
+      //   fieldProps: (form) => {
+      //     const amount = form.getFieldValue('amount');
+      //     const rate = form.getFieldValue('payoutRatio');
+      //     form.setFieldValue('ramount',amount * rate,);
+      //     return {
+      //       placeholder: '',
+      //       value: amount * rate,
+      //       disabled:true
+      //     };
+      //   },
+      // },
+      // {
+      //   title: '商户费率',
+      //   dataIndex: 'payoutRatio',
+      //   formItemProps: {
+      //     rules: [
+      //       {
+      //         required: true,
+      //         message: '此项为必填项',
+      //       },
+      //     ],
+      //   },
+      //   fieldProps: {
+      //     disabled: true
+      //   },
+      //   width: 'xl',
+      //   colProps: {
+      //     xs: 24,
+      //     md: 24,
+      //   },
+      // },
       {
         title: '充值金额',
         valueType: 'money',
@@ -508,7 +612,7 @@ export default () => {
 
   const columns: ProColumns<GithubIssueItem>[] = [
     {
-      title: 'id',
+      title: '商户号',
       dataIndex: 'id',
       ellipsis: true,
       render:(text,record)=>(<a onClick={()=>ShowDetai(record)}>{record.id}<ShareAltOutlined /></a>)
@@ -524,11 +628,17 @@ export default () => {
       dataIndex: 'status',
       // ellipsis: true,
       search: false,
-      render: (text, record) => <> <Switch checked={text === 1 ? true : false} checkedChildren="1" unCheckedChildren="0" onChange={() => { changeStatus(record) }} /> </>
+      render: (text, record) => <> <Switch checked={text === 1 ? true : false} checkedChildren="正常" unCheckedChildren="封禁" onChange={() => { changeStatus(record) }} /> </>
     },
     {
       title: '代收费率',
       dataIndex: 'settleRatio',
+      ellipsis: true,
+      search: false,
+    },
+    {
+      title: '代付单笔',
+      dataIndex: 'payoutSingleTrans',
       ellipsis: true,
       search: false,
     },

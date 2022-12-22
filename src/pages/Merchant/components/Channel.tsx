@@ -1,4 +1,4 @@
-import { Button, Space, Drawer, Switch } from 'antd';
+import { Button, Popconfirm, Drawer, Switch } from 'antd';
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProFormColumnsType, ProFormLayoutType, ProFormInstance } from '@ant-design/pro-components';
 import { ProTable, TableDropdown, BetaSchemaForm } from '@ant-design/pro-components';
@@ -77,8 +77,8 @@ const FormDrawer: React.FC<FormDrawerProps> = ({ title, open, onClose, columns, 
 
 
 
-export default ({ merchantId,channelList }) => {
-    console.log(channelList,'-----------')
+export default ({ merchantId, channelList }) => {
+    console.log(channelList, '-----------')
     const actionRef = useRef<ActionType>();
     const formRef = useRef<ProFormInstance>();
     const [formState, setFormState] = useState<FormDrawerProps>({
@@ -98,7 +98,7 @@ export default ({ merchantId,channelList }) => {
 
     const changeStatus = async (record) => {
         await updateMerchantChannel({
-            id:record.id,
+            id: record.id,
             status: record.status === 0 ? 1 : 0
         })
         if (formRef.current) {
@@ -107,8 +107,8 @@ export default ({ merchantId,channelList }) => {
     }
     const deleteItem = async (record) => {
         await updateMerchantChannel({
-            id:record.id,
-            valid:  0
+            id: record.id,
+            valid: 0
         })
         if (formRef.current) {
             formRef.current.submit()
@@ -148,11 +148,11 @@ export default ({ merchantId,channelList }) => {
                         },
                     ],
                 },
-                fieldProps:{
-                    options:channelList.map(item=>({
+                fieldProps: {
+                    options: channelList.map(item => ({
                         value: item.id,
                         label: item.name,
-                      }))
+                    }))
                 },
                 width: 'xl',
                 colProps: {
@@ -192,7 +192,7 @@ export default ({ merchantId,channelList }) => {
             title: '创建',
             open: true,
             columns,
-            initValue: {merchantId},
+            initValue: { merchantId },
             submit: addMerchantChannel,
             callback: () => {
                 console.log('call', actionRef.current)
@@ -445,7 +445,7 @@ export default ({ merchantId,channelList }) => {
             dataIndex: 'status',
             // ellipsis: true,
             search: false,
-            render: (text, record) => <> <Switch checked={text === 1 ? true : false} checkedChildren="1" unCheckedChildren="0" onChange={() => { changeStatus(record) }} /> </>
+            render: (text, record) => <> <Switch checked={text === 1 ? true : false} checkedChildren="正常" unCheckedChildren="封禁" onChange={() => { changeStatus(record) }} /> </>
         },
         {
             title: '日限额',
@@ -464,18 +464,29 @@ export default ({ merchantId,channelList }) => {
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
-              <Button
-                key="editable"
-                danger
-                type='primary'
-                onClick={() => { deleteItem(record) }}
-              >
-            删除
-              </Button>,
-              
-      
+                <Popconfirm
+                    title="删除通道不可逆，确定要删除本通道吗"
+                    description="删除通道不可逆，确定要删除本通道吗"
+                    onConfirm={() => { deleteItem(record) }}
+                   
+                    okText="删除"
+                    cancelText="取消"
+                    key="editable"
+                >
+                    <Button
+                        key="editable"
+                        danger
+                        type='primary'
+                       
+                    >
+                        删除
+                    </Button>
+                </Popconfirm>
+                ,
+
+
             ],
-          },
+        },
 
     ];
 
@@ -512,7 +523,7 @@ export default ({ merchantId,channelList }) => {
                 search={{
                     optionRender: false,
                     collapsed: false,
-                  }}
+                }}
                 options={{
                     setting: {
                         listsHeight: 400,

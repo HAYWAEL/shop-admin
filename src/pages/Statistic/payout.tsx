@@ -80,8 +80,8 @@ const columns: ProColumns<GithubIssueItem>[] = [
     search: false,
   },
   {
-    title: '订单手续费',
-    dataIndex: 'fee',
+    title: '代理ID',
+    dataIndex: 'agencyId',
     ellipsis: true,
     search: false,
   },
@@ -169,7 +169,7 @@ export default () => {
                     if (keyMap[key]) {
                       newObj[keyMap[key]] = item[key]
                     } else {
-                      newObj[key] = item[key]
+                      // newObj[key] = item[key]
                     }
                   })
                   return newObj

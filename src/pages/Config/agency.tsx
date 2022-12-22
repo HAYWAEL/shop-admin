@@ -172,6 +172,12 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
       {
         title: '代付费率',
@@ -188,6 +194,12 @@ export default () => {
         colProps: {
           xs: 24,
           md: 24,
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
         },
       },
       {
@@ -225,7 +237,14 @@ export default () => {
           xs: 24,
           md: 24,
         },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
+        },
       },
+      
       {
         title: '平台费率',
         dataIndex: 'channelRatio',
@@ -236,6 +255,12 @@ export default () => {
         colProps: {
           xs: 24,
           md: 24,
+        },
+        valueType: 'digit',
+        fieldProps: {
+          precision: 3,
+          max: 1,
+          min: 0
         },
       },
       {

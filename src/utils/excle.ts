@@ -21,6 +21,7 @@ function getCharCol(n) {
   return s;
 }
 function downloadExl(json, type, name) {
+
   let tmpdata = json[0];
   json.unshift({});
   const keyMap = []; // 获取keys
